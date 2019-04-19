@@ -4,121 +4,110 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Rextester
+namespace boyer_moor
 {
-
-    public class Boyer
-    {
-
-
-        public int max(int a, int b) { return (a > b) ? a : b; }
-
-        // The preprocessing function for Boyer Moore's
-        // bad character heuristic
-        public void badCharHeuristic(String str, int size, int[] badchar)
-        {
-            int i;
-
-            // Initialize all occurrences as -1
-            for (i = 0; i < 256; i++)
-                badchar[i] = -1;
-
-            // Fill the actual value of last occurrence 
-            // of a character
-            for (i = 0; i < size; i++)
-                badchar[(int)str[i]] = i;
-        }
-
-        /* A pattern searching function that uses Bad
-           Character Heuristic of Boyer Moore Algorithm */
-        public void search(String txt, String pat)
-        {
-            int pattern_length = pat.Length;
-            int txt_length = txt.Length;
-
-            int[] badchar = new int[256];
-
-            /* Fill the bad character array by calling 
-               the preprocessing function badCharHeuristic() 
-               for given pattern */
-            badCharHeuristic(pat, pattern_length, badchar);
-
-            int shift_pattern_withrespect_text = 0;  // s is shift of the pattern with 
-                                                     // respect to text
-            while (shift_pattern_withrespect_text <= (txt_length - pattern_length))
-            {
-                int j = pattern_length - 1;
-
-                /* Keep reducing index j of pattern while 
-                   characters of pattern and text are 
-                   matching at this shift s */
-                while (j >= 0 && pat[j] == txt[shift_pattern_withrespect_text + j])
-                {
-
-                    Console.Write("\n pat[j] =" + pat[j] + " j= " + j);
-                    j--;
-                }
-                /* If the pattern is present at current
-                   shift, then index j will become -1 after
-                   the above loop */
-                if (j < 0)
-                {
-                    Console.Write("\n pattern occurs at shift =" + shift_pattern_withrespect_text);
-
-                    /* Shift the pattern so that the next 
-                       character in text aligns with the last 
-                       occurrence of it in pattern.
-                       The condition s+m < n is necessary for 
-                       the case when pattern occurs at the end 
-                       of text */
-                    // shift_pattern_withrespect_text += (shift_pattern_withrespect_text+pattern_length < txt_length)? pattern_length-badchar[txt[shift_pattern_withrespect_text+pattern_length]] : 1;
-
-                    shift_pattern_withrespect_text += (shift_pattern_withrespect_text + pattern_length < txt_length) ? pattern_length + 1 : 1;
-
-
-
-
-
-
-                }
-
-                else
-                    /* Shift the pattern so that the bad character
-                       in text aligns with the last occurrence of
-                       it in pattern. The max function is used to
-                       make sure that we get a positive shift. 
-                       We may get a negative shift if the last 
-                       occurrence  of bad character in pattern
-                       is on the right side of the current 
-                       character. */
-                    shift_pattern_withrespect_text += max(1, j - badchar[txt[shift_pattern_withrespect_text + j]]);
-
-                Console.Write("\nS----" + shift_pattern_withrespect_text);
-            }
-        }
-
-
-    }
-
-
-
-
     public class Program
     {
 
-
-
         public static void Main(string[] args)
         {
+            Console.WriteLine("Input main string");
+            string str1 = Console.ReadLine();
+            Console.WriteLine("Input searched string");
+            string str2 = Console.ReadLine();
 
 
-            Boyer b = new Boyer();
-            int[] bad = new int[4];
-            int i = 0;
+            int position = FindSubstring(str1, str2);
+            Console.WriteLine(position);
 
-            b.search("TESTING", "ST");
+        }
+
+        private static int FindSubstring(string str1, string str2)
+        {
+            int n = str1.Length;
+            int m = str2.Length;
+            int count = 0;
+            int[] d = GetIndexFunction(str2);
+
+            int i = 0, j = 0;
+            while (j < m && i - j < n - m + 1)
+            {
+                if (str1[i] == str2[j])
+                {
+                    Console.WriteLine(str2[j] + " " + str1[i]);
+
+                    j++;
+                    i++;
+                    count++;
+                }
+
+                else if (j == 0)
+                {
+                    Console.WriteLine(str2[j] + " " + str1[i]);
 
 
+                    i++;
+
+                    count++;
+                }
+                else
+                {
+                    Console.WriteLine(str2[j] + " " + str1[i]);
+
+
+                    count++;
+                    i = i - d[j - 1];
+                    j = 0;
+                }
+
+            }
+
+            if (j == m)
+            {
+                Console.WriteLine("Operation count : " + count);
+                Console.WriteLine("UnderIndex : ");
+                return i - j + 1;
+            }
+            else
+            {
+                Console.WriteLine("Operation count : " + count);
+
+                return -1;
+            }
+        }
+
+        private static int[] GetIndexFunction(string str2)
+        {
+            int length = str2.Length;
+            int[] result = new int[length];
+            int j = 1;
+            int i = length-2;
+            while (i>=0)
+            {
+                result[i] = j;
+                for (int o = i; o < length - 2; o++)
+                {
+                    if(str2[i]==str2[o])
+                    result[i] = result[o];
+                }
+
+                j++;
+                i--;
+            }
+            result[length - 1] = length;
+
+            for (int o = 0; o < length-1; o++)
+            {
+                if(str2[length-1] == str2[o])
+                    result[length-1] = result[o];
+            }
+
+            for (int p = 0; p < length ; p++)
+            {
+                Console.Write(result[p]+" ");
+            }
+            Console.WriteLine();
+            return result;
         }
     }
 }
