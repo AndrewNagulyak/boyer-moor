@@ -27,46 +27,51 @@ namespace boyer_moor
             int n = str1.Length;
             int m = str2.Length;
             int count = 0;
+            bool flag = false;
             int[] d = GetIndexFunction(str2);
 
             int i = 0, j = 0;
-            while (j < m && i - j < n - m + 1)
+            while (i <= n - m)
             {
-                if (str1[i] == str2[j])
-                {
-                    Console.WriteLine(str2[j] + " " + str1[i]);
+                count++;
+                j = m - 1;
 
-                    j++;
-                    i++;
+                while (j >= 0 && str2[j] == str1[i + j])
+                {
+                    j--;
                     count++;
                 }
 
-                else if (j == 0)
+                
+                if (j < 0)
                 {
-                    Console.WriteLine(str2[j] + " " + str1[i]);
-
-
-                    i++;
-
-                    count++;
+                    break;
                 }
                 else
                 {
-                    Console.WriteLine(str2[j] + " " + str1[i]);
+                    for(int o=0; o<m;o++)
+                        if (str2[o] == str1[i+j])
+                        {
+                            flag = true;
+                            i += d[o];
+                            break;
+                        }
 
-
-                    count++;
-                    i = i - d[j - 1];
-                    j = 0;
+                    if (!flag)
+                    {
+                        i += m;
+                        flag = false;
+                    }
                 }
-
             }
 
-            if (j == m)
+        
+
+            if (j < 0)
             {
-                Console.WriteLine("Operation count : " + count);
+                Console.WriteLine("Operation count : " + (count-1));
                 Console.WriteLine("UnderIndex : ");
-                return i - j + 1;
+                return i+1;
             }
             else
             {
