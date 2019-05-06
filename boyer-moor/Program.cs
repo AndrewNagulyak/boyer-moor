@@ -90,7 +90,7 @@ namespace boyer_moor
             while (i>=0)
             {
                 result[i] = j;
-                for (int o = i; o < length - 2; o++)
+                for (int o = i; o < length - 1; o++)
                 {
                     if(str2[i]==str2[o])
                     result[i] = result[o];
